@@ -35,8 +35,7 @@ class TextParser(DocumentParser):
         # Split into paragraph-based sections
         paragraphs = [p.strip() for p in cleaned.split("\n\n") if p.strip()]
         sections = [
-            {"content": p, "section": f"Paragraph {i + 1}"}
-            for i, p in enumerate(paragraphs)
+            {"content": p, "section": f"Paragraph {i + 1}"} for i, p in enumerate(paragraphs)
         ]
 
         if not sections:

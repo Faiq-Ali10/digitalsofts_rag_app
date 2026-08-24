@@ -53,9 +53,9 @@ class AgentState:
     message_history: list[dict[str, str]] = field(default_factory=list)
 
     # ── Intent Classification ────────────────────────────────────────────
-    intent: Literal[
-        "knowledge", "structured", "action", "unsupported", "blocked", "pending"
-    ] = "pending"
+    intent: Literal["knowledge", "structured", "action", "unsupported", "blocked", "pending"] = (
+        "pending"
+    )
     intent_confidence: float = 0.0
     injection_detected: bool = False
 

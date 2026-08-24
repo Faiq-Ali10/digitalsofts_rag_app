@@ -111,7 +111,6 @@ class ToolConfirmRequest(BaseModel):
     confirm: bool
 
 
-
 # ── Chat Endpoint ────────────────────────────────────────────────────────────
 
 
@@ -132,14 +131,10 @@ async def chat(
     6. Return response with citations
     """
     # 1. Get or create conversation
-    conv = await get_or_create_conversation(
-        db, current_user.id, body.conversation_id
-    )
+    conv = await get_or_create_conversation(db, current_user.id, body.conversation_id)
 
     # 2. Save user message
-    user_msg = await save_message(
-        db, conv.id, MessageRole.USER, body.message
-    )
+    user_msg = await save_message(db, conv.id, MessageRole.USER, body.message)
 
     # 3. Load history
     history = await get_message_history(db, conv.id)
@@ -205,9 +200,7 @@ async def chat(
             response=state.response,
             conversation_id=conv.id,
             message_id=assistant_msg.id,
-            citations=[
-                CitationResponse(**c) for c in citations_data
-            ],
+            citations=[CitationResponse(**c) for c in citations_data],
             confidence=state.confidence,
             tool_calls=[
                 ToolCallResponse(
@@ -221,6 +214,7 @@ async def chat(
             latency_ms=state.latency_ms,
         )
     )
+
 
 # ── Tool Confirmation Endpoint ───────────────────────────────────────────────
 
@@ -249,6 +243,7 @@ async def confirm_tool(
         raise HTTPException(status_code=404, detail="Message not found")
 
     from app.agents.memory import get_message_history
+
     history = await get_message_history(db, msg.conversation_id)
 
     user_query = "User confirmed tool execution"
@@ -264,7 +259,7 @@ async def confirm_tool(
         user_id=str(current_user.id),
         user_role=current_user.role.value,
         intent="action",
-        message_history=history
+        message_history=history,
     )
 
     tc_record = ToolCallRecord(
@@ -322,6 +317,8 @@ async def confirm_tool(
             latency_ms=state.latency_ms,
         )
     )
+
+
 # ── Conversation Endpoints ───────────────────────────────────────────────────
 
 

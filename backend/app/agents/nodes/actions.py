@@ -58,7 +58,12 @@ async def validate_action(state: AgentState) -> AgentState:
     """
     state.current_node = "validate_action"
 
-    ALLOWED_TOOLS = {"search_products", "create_demo_request", "search_knowledge", "compare_products"}
+    ALLOWED_TOOLS = {
+        "search_products",
+        "create_demo_request",
+        "search_knowledge",
+        "compare_products",
+    }
     CONFIRMATION_REQUIRED = {"create_demo_request"}
 
     try:
@@ -227,9 +232,7 @@ async def _generate_tool_response(state: AgentState) -> None:
         )
 
     for tc in failed_tools:
-        tool_results.append(
-            f"Tool: {tc.tool_name} — FAILED: {tc.error}"
-        )
+        tool_results.append(f"Tool: {tc.tool_name} — FAILED: {tc.error}")
 
     context = "\n\n".join(tool_results)
 

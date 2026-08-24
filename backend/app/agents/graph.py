@@ -38,9 +38,13 @@ except ImportError:
     def observe(*args, **kwargs):
         def decorator(func):
             return func
+
         return decorator
+
     class _DummyContext:
-        def update_current_trace(self, **kwargs): pass
+        def update_current_trace(self, **kwargs):
+            pass
+
     langfuse_context = _DummyContext()
 
 logger = structlog.get_logger(__name__)
@@ -204,8 +208,7 @@ async def run_agent(
         )
         state.error = str(e)
         state.response = (
-            "I apologize, but I encountered an unexpected error. "
-            "Please try again in a moment."
+            "I apologize, but I encountered an unexpected error. Please try again in a moment."
         )
         state.confidence = "unsupported"
 

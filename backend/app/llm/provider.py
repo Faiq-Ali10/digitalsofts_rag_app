@@ -37,9 +37,8 @@ class LLMResponse:
             "groq/llama-3.1-70b-versatile": (0.59, 0.79),
         }
         input_rate, output_rate = cost_map.get(self.model, (0.5, 1.5))
-        return (
-            (self.prompt_tokens * input_rate / 1_000_000)
-            + (self.completion_tokens * output_rate / 1_000_000)
+        return (self.prompt_tokens * input_rate / 1_000_000) + (
+            self.completion_tokens * output_rate / 1_000_000
         )
 
 

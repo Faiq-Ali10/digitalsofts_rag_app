@@ -37,6 +37,7 @@ async def lifespan(app: FastAPI):
 
     # Register agent tools
     from app.tools.registry import register_all_tools
+
     register_all_tools()
 
     logger.info(

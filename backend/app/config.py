@@ -32,9 +32,7 @@ class Settings(BaseSettings):
     secret_key: str = "change-me-to-a-random-secret-key-min-32-chars"
 
     # ── Database ─────────────────────────────────────────────────────────
-    database_url: str = (
-        "postgresql+asyncpg://postgres:postgres@localhost:5432/digitalsofts"
-    )
+    database_url: str = "postgresql+asyncpg://postgres:postgres@localhost:5432/digitalsofts"
     database_pool_size: int = 10
     database_max_overflow: int = 20
 
@@ -76,9 +74,7 @@ class Settings(BaseSettings):
     langfuse_host: str = "http://localhost:3000"
 
     # ── CORS ─────────────────────────────────────────────────────────────
-    cors_origins: list[str] = Field(
-        default=["http://localhost:3000", "http://localhost:8000"]
-    )
+    cors_origins: list[str] = Field(default=["http://localhost:3000", "http://localhost:8000"])
 
     @field_validator("cors_origins", mode="before")
     @classmethod

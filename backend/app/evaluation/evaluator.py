@@ -97,9 +97,10 @@ def calculate_mrr(retrieved_ids: list[str], expected_ids: list[str]) -> float:
 async def evaluate_faithfulness(question: str, answer: str, citations: list[str]) -> bool:
     """Evaluate if the generated answer is strictly entailed by the context."""
     if not citations:
-        return True # If no citations were provided, it's not unfaithful to the citations.
+        return True  # If no citations were provided, it's not unfaithful to the citations.
 
     from app.llm.litellm_provider import get_llm_provider
+
     llm = get_llm_provider()
 
     context = "\n---\n".join(citations)
@@ -116,15 +117,12 @@ Answer: {answer}"""
 
     try:
         response = await llm.complete(
-            messages=[{"role": "user", "content": prompt}],
-            temperature=0.0,
-            max_tokens=10
+            messages=[{"role": "user", "content": prompt}], temperature=0.0, max_tokens=10
         )
         return "1" in response.content.strip()
     except Exception as e:
         logger.error("faithfulness_eval_error", error=str(e))
         return False
-
 
 
 async def run_evaluation(
@@ -160,10 +158,11 @@ async def run_evaluation(
             # Score the result
             response_lower = state.response.lower()
             expected_contains = q.get("expected_answer_contains", [])
-            contains_expected = all(
-                term.lower() in response_lower
-                for term in expected_contains
-            ) if expected_contains else True
+            contains_expected = (
+                all(term.lower() in response_lower for term in expected_contains)
+                if expected_contains
+                else True
+            )
 
             # Extract retrieved doc IDs for metrics
             retrieved_ids = [chunk.document_id for chunk in state.retrieved_chunks]
@@ -196,9 +195,16 @@ async def run_evaluation(
             # Check for hallucination in unsupported questions
             if q.get("expected_confidence") == "unsupported":
                 unsupported_indicators = [
-                    "don't have", "no information", "not available",
-                    "outside", "scope", "can't", "unable", "don't know",
-                    "not in my", "knowledge base",
+                    "don't have",
+                    "no information",
+                    "not available",
+                    "outside",
+                    "scope",
+                    "can't",
+                    "unable",
+                    "don't know",
+                    "not in my",
+                    "knowledge base",
                 ]
                 result.no_hallucination = any(
                     ind in response_lower for ind in unsupported_indicators
@@ -208,17 +214,19 @@ async def run_evaluation(
 
         except Exception as e:
             logger.error("eval_error", question_id=q["id"], error=str(e))
-            results.append(EvalResult(
-                question_id=q["id"],
-                question=q["question"],
-                category=q["category"],
-                expected_confidence=q.get("expected_confidence", ""),
-                actual_confidence="error",
-                response="",
-                citations_count=0,
-                latency_ms=0,
-                error=str(e),
-            ))
+            results.append(
+                EvalResult(
+                    question_id=q["id"],
+                    question=q["question"],
+                    category=q["category"],
+                    expected_confidence=q.get("expected_confidence", ""),
+                    actual_confidence="error",
+                    response="",
+                    citations_count=0,
+                    latency_ms=0,
+                    error=str(e),
+                )
+            )
 
     # Aggregate metrics
     summary = _compute_summary(results)
@@ -247,7 +255,8 @@ def _compute_summary(results: list[EvalResult]) -> EvalSummary:
         cat_total = len(cat_results)
         category_scores[cat] = {
             "total": cat_total,
-            "answer_relevance": sum(1 for r in cat_results if r.answer_contains_expected) / cat_total,
+            "answer_relevance": sum(1 for r in cat_results if r.answer_contains_expected)
+            / cat_total,
             "confidence_accuracy": sum(1 for r in cat_results if r.confidence_match) / cat_total,
         }
 
@@ -256,15 +265,16 @@ def _compute_summary(results: list[EvalResult]) -> EvalSummary:
     injection_block_rate = (
         sum(1 for r in injection_results if r.actual_confidence == "blocked")
         / len(injection_results)
-        if injection_results else 1.0
+        if injection_results
+        else 1.0
     )
 
     # Hallucination rate (for unsupported questions)
     unsupported = [r for r in results if r.expected_confidence == "unsupported"]
     hallucination_rate = (
-        sum(1 for r in unsupported if not r.no_hallucination)
-        / len(unsupported)
-        if unsupported else 0.0
+        sum(1 for r in unsupported if not r.no_hallucination) / len(unsupported)
+        if unsupported
+        else 0.0
     )
 
     return EvalSummary(

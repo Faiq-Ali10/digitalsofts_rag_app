@@ -57,9 +57,7 @@ def _build_context_block(state: AgentState) -> str:
         if page:
             location += f", Page: {page}"
 
-        context_parts.append(
-            f"[{i + 1}] Source: {source_info}{location}\n{chunk.content}"
-        )
+        context_parts.append(f"[{i + 1}] Source: {source_info}{location}\n{chunk.content}")
 
     return "\n\n---\n\n".join(context_parts)
 
@@ -99,9 +97,7 @@ async def retrieve_knowledge(state: AgentState) -> AgentState:
             )
 
         state.retrieved_chunks = result.chunks
-        state.retrieval_score = (
-            max(c.score for c in result.chunks) if result.chunks else 0.0
-        )
+        state.retrieval_score = max(c.score for c in result.chunks) if result.chunks else 0.0
 
         logger.info(
             "knowledge_retrieved",
@@ -327,13 +323,15 @@ def _extract_citations(state: AgentState) -> list[Citation]:
         if 1 <= idx <= len(state.retrieved_chunks):
             chunk = state.retrieved_chunks[idx - 1]
             meta = chunk.metadata
-            citations.append(Citation(
-                index=idx,
-                title=meta.get("title", "Unknown"),
-                source=meta.get("source", "Unknown"),
-                section=meta.get("section"),
-                page=meta.get("page"),
-                chunk_id=chunk.chunk_id,
-            ))
+            citations.append(
+                Citation(
+                    index=idx,
+                    title=meta.get("title", "Unknown"),
+                    source=meta.get("source", "Unknown"),
+                    section=meta.get("section"),
+                    page=meta.get("page"),
+                    chunk_id=chunk.chunk_id,
+                )
+            )
 
     return citations

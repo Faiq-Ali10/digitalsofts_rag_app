@@ -83,7 +83,11 @@ async def hybrid_retrieve(
     start = time.monotonic()
     top_k = top_k or settings.rag_top_k
     rerank_top_k = rerank_top_k or settings.rag_rerank_top_k
-    threshold = similarity_threshold if similarity_threshold is not None else settings.rag_similarity_threshold  # noqa: E501
+    threshold = (
+        similarity_threshold
+        if similarity_threshold is not None
+        else settings.rag_similarity_threshold
+    )  # noqa: E501
 
     # 1. Dense retrieval (pgvector cosine similarity)
     dense_results = await _dense_search(query, db, top_k, metadata_filters)

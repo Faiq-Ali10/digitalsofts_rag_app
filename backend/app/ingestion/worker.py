@@ -54,6 +54,7 @@ async def startup(ctx: dict) -> None:
 
     # Pre-load embedding model to avoid first-request latency
     from app.llm.embeddings import get_embedding_provider
+
     get_embedding_provider()
 
     logger.info("arq_worker_ready")

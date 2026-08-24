@@ -59,7 +59,7 @@ def recursive_character_split(
         if sep == "":
             # Last resort: character-level split
             step = max(1, chunk_size - chunk_overlap)
-            splits = [text[i: i + chunk_size] for i in range(0, len(text), step)]
+            splits = [text[i : i + chunk_size] for i in range(0, len(text), step)]
             return [s for s in splits if s.strip()]
 
         parts = text.split(sep)
@@ -80,7 +80,7 @@ def recursive_character_split(
                     chunks.append(current.strip())
                 # If a single part exceeds chunk_size, recursively split it
                 if len(part) > chunk_size:
-                    remaining_seps = separators[separators.index(sep) + 1:]
+                    remaining_seps = separators[separators.index(sep) + 1 :]
                     sub_chunks = recursive_character_split(
                         part, chunk_size, chunk_overlap, remaining_seps
                     )
@@ -102,7 +102,7 @@ def recursive_character_split(
                     # Find a clean break point in the overlap
                     break_point = overlap_text.rfind(" ")
                     if break_point > 0:
-                        overlap_text = overlap_text[break_point + 1:]
+                        overlap_text = overlap_text[break_point + 1 :]
                     overlapped.append(overlap_text + " " + chunks[i])
                 return [c for c in overlapped if c.strip()]
 
@@ -142,9 +142,7 @@ def chunk_document(
             section_text = section["content"]
             section_name = section.get("section", "Unknown")
 
-            text_chunks = recursive_character_split(
-                section_text, chunk_size, chunk_overlap
-            )
+            text_chunks = recursive_character_split(section_text, chunk_size, chunk_overlap)
 
             for text in text_chunks:
                 meta = {**base_metadata, "section": section_name}
@@ -153,21 +151,25 @@ def chunk_document(
                 if "level" in section:
                     meta["heading_level"] = section["level"]
 
-                chunks.append(TextChunk(
-                    content=text,
-                    chunk_index=chunk_index,
-                    metadata=meta,
-                ))
+                chunks.append(
+                    TextChunk(
+                        content=text,
+                        chunk_index=chunk_index,
+                        metadata=meta,
+                    )
+                )
                 chunk_index += 1
     else:
         # Chunk the entire document
         text_chunks = recursive_character_split(content, chunk_size, chunk_overlap)
         for text in text_chunks:
-            chunks.append(TextChunk(
-                content=text,
-                chunk_index=chunk_index,
-                metadata=base_metadata,
-            ))
+            chunks.append(
+                TextChunk(
+                    content=text,
+                    chunk_index=chunk_index,
+                    metadata=base_metadata,
+                )
+            )
             chunk_index += 1
 
     return chunks

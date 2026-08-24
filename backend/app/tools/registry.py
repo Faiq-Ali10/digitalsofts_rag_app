@@ -137,8 +137,7 @@ async def search_products(
 
         # Simple text search on name and description
         stmt = stmt.where(
-            Product.name.ilike(f"%{query}%")
-            | Product.description.ilike(f"%{query}%")
+            Product.name.ilike(f"%{query}%") | Product.description.ilike(f"%{query}%")
         )
         stmt = stmt.limit(10)
 
@@ -281,37 +280,46 @@ async def compare_products(
 
 # ── Register all tools ───────────────────────────────────────────────────────
 
+
 def register_all_tools() -> None:
     """Register all available tools. Called at application startup."""
-    register_tool(ToolDefinition(
-        name="search_products",
-        description="Search for products and services",
-        handler=search_products,
-        required_role="user",
-        timeout_seconds=10,
-    ))
+    register_tool(
+        ToolDefinition(
+            name="search_products",
+            description="Search for products and services",
+            handler=search_products,
+            required_role="user",
+            timeout_seconds=10,
+        )
+    )
 
-    register_tool(ToolDefinition(
-        name="create_demo_request",
-        description="Create a product demo request",
-        handler=create_demo_request,
-        required_role="user",
-        timeout_seconds=10,
-        requires_confirmation=True,
-    ))
+    register_tool(
+        ToolDefinition(
+            name="create_demo_request",
+            description="Create a product demo request",
+            handler=create_demo_request,
+            required_role="user",
+            timeout_seconds=10,
+            requires_confirmation=True,
+        )
+    )
 
-    register_tool(ToolDefinition(
-        name="search_knowledge",
-        description="Search the knowledge base",
-        handler=search_knowledge,
-        required_role="user",
-        timeout_seconds=15,
-    ))
+    register_tool(
+        ToolDefinition(
+            name="search_knowledge",
+            description="Search the knowledge base",
+            handler=search_knowledge,
+            required_role="user",
+            timeout_seconds=15,
+        )
+    )
 
-    register_tool(ToolDefinition(
-        name="compare_products",
-        description="Compare two products",
-        handler=compare_products,
-        required_role="user",
-        timeout_seconds=10,
-    ))
+    register_tool(
+        ToolDefinition(
+            name="compare_products",
+            description="Compare two products",
+            handler=compare_products,
+            required_role="user",
+            timeout_seconds=10,
+        )
+    )

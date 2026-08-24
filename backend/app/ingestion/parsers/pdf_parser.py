@@ -57,11 +57,13 @@ class PDFParser(DocumentParser):
             cleaned = self.clean_text(text)
 
             if cleaned:
-                sections.append({
-                    "content": cleaned,
-                    "page": str(page_num + 1),
-                    "section": f"Page {page_num + 1}",
-                })
+                sections.append(
+                    {
+                        "content": cleaned,
+                        "page": str(page_num + 1),
+                        "section": f"Page {page_num + 1}",
+                    }
+                )
                 all_text.append(cleaned)
 
         metadata = {

@@ -75,15 +75,9 @@ async def get_message_history(
 
     history = []
     if summary:
-        history.append({
-            "role": "system",
-            "content": f"Previous conversation summary: {summary}"
-        })
+        history.append({"role": "system", "content": f"Previous conversation summary: {summary}"})
 
-    history.extend([
-        {"role": msg.role.value, "content": msg.content}
-        for msg in messages
-    ])
+    history.extend([{"role": msg.role.value, "content": msg.content} for msg in messages])
 
     return history
 
@@ -113,9 +107,7 @@ async def save_message(
     db.add(msg)
 
     # Update conversation message count and title
-    conv_result = await db.execute(
-        select(Conversation).where(Conversation.id == conversation_id)
-    )
+    conv_result = await db.execute(select(Conversation).where(Conversation.id == conversation_id))
     conv = conv_result.scalar_one_or_none()
     if conv:
         conv.message_count = (conv.message_count or 0) + 1
@@ -156,9 +148,7 @@ async def update_conversation_summary(
     summary: str,
 ) -> None:
     """Store a conversation summary."""
-    result = await db.execute(
-        select(Conversation).where(Conversation.id == conversation_id)
-    )
+    result = await db.execute(select(Conversation).where(Conversation.id == conversation_id))
     conv = result.scalar_one_or_none()
     if conv:
         conv.summary = summary
@@ -192,12 +182,9 @@ async def summarize_conversation_task(conversation_id: uuid.UUID) -> None:
                 messages=[
                     {
                         "role": "system",
-                        "content": "Summarize the following conversation concisely. Focus on the user's main goals, key facts established, and any pending actions. Do not exceed 200 words."
+                        "content": "Summarize the following conversation concisely. Focus on the user's main goals, key facts established, and any pending actions. Do not exceed 200 words.",
                     },
-                    {
-                        "role": "user",
-                        "content": history_text
-                    }
+                    {"role": "user", "content": history_text},
                 ],
                 temperature=0.1,
                 max_tokens=300,

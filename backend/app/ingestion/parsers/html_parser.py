@@ -64,11 +64,13 @@ class HTMLParser(DocumentParser):
                     content_parts.append(text)
 
             if content_parts:
-                sections.append({
-                    "content": f"{section_title}\n\n" + "\n".join(content_parts),
-                    "section": section_title,
-                    "level": heading.name[1],
-                })
+                sections.append(
+                    {
+                        "content": f"{section_title}\n\n" + "\n".join(content_parts),
+                        "section": section_title,
+                        "level": heading.name[1],
+                    }
+                )
 
         # Full text extraction
         text = soup.get_text(separator="\n", strip=True)

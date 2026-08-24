@@ -62,14 +62,16 @@ def mock_admin_user():
 def mock_llm_provider():
     """Mock LLM provider that returns controlled responses."""
     provider = AsyncMock()
-    provider.complete = AsyncMock(return_value=LLMResponse(
-        content='{"intent": "knowledge", "confidence": 0.9, "reasoning": "test"}',
-        model="test-model",
-        prompt_tokens=100,
-        completion_tokens=50,
-        total_tokens=150,
-        latency_ms=500,
-    ))
+    provider.complete = AsyncMock(
+        return_value=LLMResponse(
+            content='{"intent": "knowledge", "confidence": 0.9, "reasoning": "test"}',
+            model="test-model",
+            prompt_tokens=100,
+            completion_tokens=50,
+            total_tokens=150,
+            latency_ms=500,
+        )
+    )
     return provider
 
 
@@ -77,11 +79,13 @@ def mock_llm_provider():
 def mock_embedding_provider():
     """Mock embedding provider."""
     provider = AsyncMock()
-    provider.embed = AsyncMock(return_value=EmbeddingResponse(
-        embeddings=[[0.1] * 384],
-        model="test-model",
-        total_tokens=10,
-        latency_ms=50,
-    ))
+    provider.embed = AsyncMock(
+        return_value=EmbeddingResponse(
+            embeddings=[[0.1] * 384],
+            model="test-model",
+            total_tokens=10,
+            latency_ms=50,
+        )
+    )
     provider.get_dimension = MagicMock(return_value=384)
     return provider

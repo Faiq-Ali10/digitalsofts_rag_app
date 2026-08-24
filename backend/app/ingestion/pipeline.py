@@ -142,15 +142,13 @@ async def ingest_document(
         all_embeddings: list[list[float]] = []
         batch_size = 64
         for i in range(0, len(chunk_texts), batch_size):
-            batch = chunk_texts[i: i + batch_size]
+            batch = chunk_texts[i : i + batch_size]
             response = await embedder.embed(batch)
             all_embeddings.extend(response.embeddings)
 
         # 6. Delete old chunks (for re-ingestion)
         await db.execute(
-            DocumentChunk.__table__.delete().where(
-                DocumentChunk.document_id == document_id
-            )
+            DocumentChunk.__table__.delete().where(DocumentChunk.document_id == document_id)
         )
 
         # 7. Store new chunks

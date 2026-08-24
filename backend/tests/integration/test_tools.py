@@ -14,8 +14,9 @@ async def test_execute_tool_invalid_tool():
             tool_name="non_existent_tool",
             tool_input={},
             user_id="test_user",
-            user_role=UserRole.USER
+            user_role=UserRole.USER,
         )
+
 
 @pytest.mark.asyncio
 async def test_execute_tool_permission_denied():
@@ -26,20 +27,20 @@ async def test_execute_tool_permission_denied():
     async def mock_admin_tool():
         return {}
 
-    register_tool(ToolDefinition(
-        name="admin_only_tool",
-        description="test",
-        handler=mock_admin_tool,
-        required_role="admin"
-    ))
+    register_tool(
+        ToolDefinition(
+            name="admin_only_tool",
+            description="test",
+            handler=mock_admin_tool,
+            required_role="admin",
+        )
+    )
 
     with pytest.raises(PermissionError, match="Insufficient permissions"):
         await execute_tool(
-            tool_name="admin_only_tool",
-            tool_input={},
-            user_id="test_user",
-            user_role=UserRole.USER
+            tool_name="admin_only_tool", tool_input={}, user_id="test_user", user_role=UserRole.USER
         )
+
 
 @pytest.mark.asyncio
 async def test_execute_tool_invalid_args():
@@ -48,8 +49,5 @@ async def test_execute_tool_invalid_args():
     # search_products requires 'query' but we pass an empty dict, which should raise a TypeError when unpacking or calling.  # noqa: E501
     with pytest.raises(TypeError):
         await execute_tool(
-            tool_name="search_products",
-            tool_input={},
-            user_id="test_user",
-            user_role=UserRole.USER
+            tool_name="search_products", tool_input={}, user_id="test_user", user_role=UserRole.USER
         )

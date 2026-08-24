@@ -10,6 +10,7 @@ from app.retrieval.retriever import RetrievedChunk
 @pytest.mark.asyncio
 async def test_agent_unsupported_intent(monkeypatch):
     """Test that unsupported intents route directly to the unsupported response node."""
+
     async def mock_classify_intent(state: AgentState):
         state.intent = "unsupported"
         state.intent_confidence = 0.99
@@ -44,7 +45,7 @@ async def test_agent_knowledge_workflow(monkeypatch):
                 document_id="doc1",
                 content="Digitalsofts flagship product is Enterprise Suite.",
                 metadata={"title": "Product Guide", "source": "guide.md"},
-                score=0.9
+                score=0.9,
             )
         ]
         state.retrieval_query = state.query
@@ -65,13 +66,9 @@ async def test_agent_knowledge_workflow(monkeypatch):
     # 5. Mock verification
     async def mock_verify_response(state: AgentState):
         from app.agents.state import Citation
+
         state.citations = [
-            Citation(
-                index=1,
-                title="Product Guide",
-                source="guide.md",
-                chunk_id="chunk1"
-            )
+            Citation(index=1, title="Product Guide", source="guide.md", chunk_id="chunk1")
         ]
         state.current_node = "verify_response"
         return state

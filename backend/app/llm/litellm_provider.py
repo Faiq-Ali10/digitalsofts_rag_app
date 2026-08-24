@@ -78,7 +78,9 @@ class LiteLLMProvider(LLMProvider):
     ):
         self.primary_model = primary_model or settings.llm_primary_model
         self.fallback_model = fallback_model or settings.llm_fallback_model
-        self.default_temperature = temperature if temperature is not None else settings.llm_temperature  # noqa: E501
+        self.default_temperature = (
+            temperature if temperature is not None else settings.llm_temperature
+        )  # noqa: E501
         self.default_max_tokens = max_tokens or settings.llm_max_tokens
         self.timeout = timeout or settings.llm_timeout_seconds
         self.max_retries = max_retries if max_retries is not None else settings.llm_max_retries
@@ -88,6 +90,7 @@ class LiteLLMProvider(LLMProvider):
 
         # Set API keys as environment variables for LiteLLM
         import os
+
         if settings.gemini_api_key:
             os.environ["GEMINI_API_KEY"] = settings.gemini_api_key
         if settings.groq_api_key:
@@ -96,6 +99,7 @@ class LiteLLMProvider(LLMProvider):
         # Configure Langfuse callbacks
         if settings.langfuse_enabled:
             import litellm
+
             os.environ["LANGFUSE_PUBLIC_KEY"] = settings.langfuse_public_key
             os.environ["LANGFUSE_SECRET_KEY"] = settings.langfuse_secret_key
             os.environ["LANGFUSE_HOST"] = settings.langfuse_host
@@ -233,7 +237,7 @@ class LiteLLMProvider(LLMProvider):
                 circuit.record_failure()
 
                 if attempt < self.max_retries:
-                    backoff = min(2 ** attempt, 16)  # 1, 2, 4, 8, 16 max
+                    backoff = min(2**attempt, 16)  # 1, 2, 4, 8, 16 max
                     logger.warning(
                         "llm_retry",
                         model=model,
@@ -262,6 +266,7 @@ class LiteLLMProvider(LLMProvider):
             model = self.fallback_model
 
         import os
+
         if settings.gemini_api_key:
             os.environ["GEMINI_API_KEY"] = settings.gemini_api_key
         if settings.groq_api_key:

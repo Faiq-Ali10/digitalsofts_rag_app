@@ -4,6 +4,7 @@ Revision ID: 001_initial
 Revises: None
 Create Date: 2026-08-18
 """
+
 from __future__ import annotations
 
 from collections.abc import Sequence
@@ -196,7 +197,11 @@ def upgrade() -> None:
         sa.Column(
             "status",
             sa.Enum(
-                "pending", "approved", "executed", "failed", "rejected",
+                "pending",
+                "approved",
+                "executed",
+                "failed",
+                "rejected",
                 name="toolcallstatus",
             ),
             nullable=False,

@@ -24,6 +24,7 @@ async def promote_user(email: str):
         await db.commit()
         print(f"Successfully promoted '{email}' to ADMIN.")
 
+
 if __name__ == "__main__":
     email = "user@example.com"
     if len(sys.argv) > 1:

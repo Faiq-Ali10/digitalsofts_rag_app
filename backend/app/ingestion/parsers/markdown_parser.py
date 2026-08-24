@@ -86,10 +86,12 @@ class MarkdownParser(DocumentParser):
             section_title = match.group(2).strip()
 
             if section_content:
-                sections.append({
-                    "content": section_content,
-                    "section": section_title,
-                    "level": str(len(match.group(1))),
-                })
+                sections.append(
+                    {
+                        "content": section_content,
+                        "section": section_title,
+                        "level": str(len(match.group(1))),
+                    }
+                )
 
         return sections

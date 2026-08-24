@@ -122,9 +122,7 @@ async def upload_document(
     content_hash = hashlib.sha256(content).hexdigest()
 
     # Check for existing document with same hash
-    existing = await db.execute(
-        select(Document).where(Document.content_hash == content_hash)
-    )
+    existing = await db.execute(select(Document).where(Document.content_hash == content_hash))
     if existing.scalar_one_or_none():
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
