@@ -6,17 +6,13 @@ Create Date: 2026-08-19 15:34:18.111661
 """
 from __future__ import annotations
 
-from typing import Sequence, Union
-
-import sqlalchemy as sa
-from alembic import op
-
+from collections.abc import Sequence
 
 # revision identifiers
 revision: str = '14710c2fc6ad'
-down_revision: Union[str, None] = '9ad508746f73'
-branch_labels: Union[str, Sequence[str], None] = None
-depends_on: Union[str, Sequence[str], None] = None
+down_revision: str | None = '9ad508746f73'
+branch_labels: str | Sequence[str] | None = None
+depends_on: str | Sequence[str] | None = None
 
 
 def upgrade() -> None:

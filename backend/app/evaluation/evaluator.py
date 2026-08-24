@@ -101,7 +101,7 @@ async def evaluate_faithfulness(question: str, answer: str, citations: list[str]
 
     from app.llm.litellm_provider import get_llm_provider
     llm = get_llm_provider()
-    
+
     context = "\n---\n".join(citations)
     prompt = f"""Evaluate if the provided answer is strictly entailed by the context.
 Return '1' if faithful (the answer is fully supported by the context).
@@ -113,7 +113,7 @@ Context:
 {context}
 
 Answer: {answer}"""
-    
+
     try:
         response = await llm.complete(
             messages=[{"role": "user", "content": prompt}],
@@ -168,7 +168,7 @@ async def run_evaluation(
             # Extract retrieved doc IDs for metrics
             retrieved_ids = [chunk.document_id for chunk in state.retrieved_chunks]
             expected_docs = q.get("expected_docs", [])
-            
+
             recall_at_k = calculate_recall_at_k(retrieved_ids, expected_docs, k=5)
             mrr = calculate_mrr(retrieved_ids, expected_docs)
 

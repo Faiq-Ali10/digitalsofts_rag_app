@@ -28,7 +28,7 @@ def test_settings():
         app_env="development",
         debug=True,
         database_url="sqlite+aiosqlite:///test.db",
-        jwt_secret_key="test-secret-key-for-testing-only",
+        jwt_secret_key="test-secret-key-for-testing-only",  # noqa: S106
         gemini_api_key="test-key",
         llm_primary_model="gemini/gemini-3.6-flash",
     )

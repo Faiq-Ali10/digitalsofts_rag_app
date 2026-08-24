@@ -11,7 +11,7 @@ from __future__ import annotations
 import uuid
 
 import structlog
-from sqlalchemy import select, func
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.models import Conversation, Message, MessageRole
@@ -169,25 +169,25 @@ async def summarize_conversation_task(conversation_id: uuid.UUID) -> None:
     """Background task to summarize a conversation."""
     from app.db.session import async_session_factory
     from app.llm.litellm_provider import get_llm_provider
-    
+
     logger.info("starting_summarization", conversation_id=str(conversation_id))
-    
+
     try:
         async with async_session_factory() as db:
             # Check if we actually need to summarize
             if not await should_summarize(db, conversation_id):
                 return
-                
+
             # Get full history to summarize (up to last 20 messages)
             history = await get_message_history(db, conversation_id, max_messages=20)
-            
+
             if not history:
                 return
-                
+
             # Prepare LLM request
             llm = get_llm_provider()
             history_text = "\n".join([f"{msg['role']}: {msg['content']}" for msg in history])
-            
+
             response = await llm.complete(
                 messages=[
                     {
@@ -202,12 +202,12 @@ async def summarize_conversation_task(conversation_id: uuid.UUID) -> None:
                 temperature=0.1,
                 max_tokens=300,
             )
-            
+
             summary = response.content.strip()
             await update_conversation_summary(db, conversation_id, summary)
             await db.commit()
-            
+
             logger.info("summarization_completed", conversation_id=str(conversation_id))
-            
+
     except Exception as e:
         logger.error("summarization_failed", conversation_id=str(conversation_id), error=str(e))

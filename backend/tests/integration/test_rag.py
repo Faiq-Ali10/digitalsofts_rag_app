@@ -1,9 +1,11 @@
 """Integration tests for the RAG pipeline and LangGraph Agent."""
 
 import pytest
+
 from app.agents.graph import run_agent
 from app.agents.state import AgentState
 from app.retrieval.retriever import RetrievedChunk
+
 
 @pytest.mark.asyncio
 async def test_agent_unsupported_intent(monkeypatch):
@@ -27,13 +29,13 @@ async def test_agent_unsupported_intent(monkeypatch):
 @pytest.mark.asyncio
 async def test_agent_knowledge_workflow(monkeypatch):
     """Test the complete RAG knowledge workflow (retrieve -> evaluate -> generate -> verify)."""
-    
+
     # 1. Mock intent classification
     async def mock_classify_intent(state: AgentState):
         state.intent = "knowledge"
         state.intent_confidence = 0.95
         return state
-    
+
     # 2. Mock retrieval
     async def mock_retrieve_knowledge(state: AgentState):
         state.retrieved_chunks = [

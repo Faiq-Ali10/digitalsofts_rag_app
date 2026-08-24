@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import asyncio
 import time
-from typing import AsyncIterator
+from collections.abc import AsyncIterator  # noqa: TC003
 
 import structlog
 from litellm import acompletion
@@ -78,7 +78,7 @@ class LiteLLMProvider(LLMProvider):
     ):
         self.primary_model = primary_model or settings.llm_primary_model
         self.fallback_model = fallback_model or settings.llm_fallback_model
-        self.default_temperature = temperature if temperature is not None else settings.llm_temperature
+        self.default_temperature = temperature if temperature is not None else settings.llm_temperature  # noqa: E501
         self.default_max_tokens = max_tokens or settings.llm_max_tokens
         self.timeout = timeout or settings.llm_timeout_seconds
         self.max_retries = max_retries if max_retries is not None else settings.llm_max_retries
@@ -92,7 +92,7 @@ class LiteLLMProvider(LLMProvider):
             os.environ["GEMINI_API_KEY"] = settings.gemini_api_key
         if settings.groq_api_key:
             os.environ["GROQ_API_KEY"] = settings.groq_api_key
-            
+
         # Configure Langfuse callbacks
         if settings.langfuse_enabled:
             import litellm

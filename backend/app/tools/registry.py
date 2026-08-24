@@ -14,14 +14,13 @@ from __future__ import annotations
 import asyncio
 import hashlib
 import time
-import uuid
+from collections.abc import Callable, Coroutine  # noqa: TC003
 from dataclasses import dataclass
 from datetime import date
-from typing import Any, Callable, Coroutine
+from typing import Any  # noqa: TC003
 
 import structlog
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import get_settings
 from app.db.models import DemoRequest, Product
@@ -91,7 +90,7 @@ async def execute_tool(
             tool_def.handler(**tool_input),
             timeout=tool_def.timeout_seconds,
         )
-    except asyncio.TimeoutError:
+    except TimeoutError:
         duration = int((time.monotonic() - start) * 1000)
         logger.error(
             "tool_timeout",
@@ -101,7 +100,7 @@ async def execute_tool(
         )
         raise TimeoutError(
             f"Tool '{tool_name}' timed out after {tool_def.timeout_seconds}s"
-        )
+        ) from None
 
     duration_ms = int((time.monotonic() - start) * 1000)
 
@@ -205,7 +204,7 @@ async def create_demo_request(
         return {
             "status": "created",
             "demo_request_id": str(demo.id),
-            "message": f"Demo request created for {product}. Our team will contact {email} within 24 hours.",
+            "message": f"Demo request created for {product}. Our team will contact {email} within 24 hours.",  # noqa: E501
         }
 
 

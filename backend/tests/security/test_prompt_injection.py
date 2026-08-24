@@ -109,7 +109,7 @@ class TestToolSafety:
 
     async def test_authorization_enforced(self):
         """Tools requiring admin role should reject regular users."""
-        from app.tools.registry import ToolDefinition, register_tool, execute_tool
+        from app.tools.registry import ToolDefinition, execute_tool, register_tool
 
         # Register an admin-only tool
         register_tool(ToolDefinition(

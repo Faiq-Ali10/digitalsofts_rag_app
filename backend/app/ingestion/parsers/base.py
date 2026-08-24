@@ -58,10 +58,10 @@ class DocumentParser(ABC):
             r"(?i)system\s+(?:prompt\s+)?override",
             r"(?i)forget\s+(?:all\s+)?(?:your\s+)?(?:system\s+)?prompt",
         ]
-        
+
         for pattern in injection_patterns:
             text = re.sub(pattern, "[REDACTED_SYSTEM_OVERRIDE]", text)
-            
+
         # Collapse multiple newlines
         text = re.sub(r"\n{3,}", "\n\n", text)
         # Collapse multiple spaces

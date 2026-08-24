@@ -8,8 +8,8 @@ directly with Gemini, Groq, or any specific provider.
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from collections.abc import AsyncIterator  # noqa: TC003
 from dataclasses import dataclass, field
-from typing import AsyncIterator
 
 
 @dataclass

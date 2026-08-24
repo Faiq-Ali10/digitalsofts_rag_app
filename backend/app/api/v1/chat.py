@@ -11,8 +11,7 @@ from __future__ import annotations
 import uuid
 
 import structlog
-from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
-from fastapi.responses import StreamingResponse
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
 from pydantic import BaseModel, Field
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -25,7 +24,7 @@ from app.agents.memory import (
     summarize_conversation_task,
 )
 from app.auth.dependencies import get_current_user
-from app.core.schemas import APIResponse, PaginatedResponse
+from app.core.schemas import APIResponse
 from app.db.models import (
     Conversation,
     Feedback,
@@ -239,7 +238,7 @@ async def confirm_tool(
     # Fetch the pending tool call
     result = await db.execute(select(ToolCall).where(ToolCall.id == body.tool_call_id))
     tool_call = result.scalar_one_or_none()
-    
+
     if not tool_call or tool_call.status != ToolCallStatus.PENDING:
         raise HTTPException(status_code=404, detail="Pending tool call not found")
 
@@ -251,7 +250,7 @@ async def confirm_tool(
 
     from app.agents.memory import get_message_history
     history = await get_message_history(db, msg.conversation_id)
-    
+
     user_query = "User confirmed tool execution"
     for h in reversed(history):
         if h["role"] == "user":

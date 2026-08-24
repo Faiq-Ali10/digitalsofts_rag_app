@@ -25,7 +25,7 @@ from dataclasses import dataclass, field
 
 import structlog
 from sqlalchemy import text
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.ext.asyncio import AsyncSession  # noqa: TC002
 
 from app.config import get_settings
 from app.llm.embeddings import get_embedding_provider
@@ -83,7 +83,7 @@ async def hybrid_retrieve(
     start = time.monotonic()
     top_k = top_k or settings.rag_top_k
     rerank_top_k = rerank_top_k or settings.rag_rerank_top_k
-    threshold = similarity_threshold if similarity_threshold is not None else settings.rag_similarity_threshold
+    threshold = similarity_threshold if similarity_threshold is not None else settings.rag_similarity_threshold  # noqa: E501
 
     # 1. Dense retrieval (pgvector cosine similarity)
     dense_results = await _dense_search(query, db, top_k, metadata_filters)
@@ -312,7 +312,7 @@ async def _rerank(
         loop = asyncio.get_event_loop()
 
         def _do_rerank():
-            ranker = Ranker(model_name="ms-marco-MiniLM-L-12-v2", cache_dir="/tmp/flashrank")
+            ranker = Ranker(model_name="ms-marco-MiniLM-L-12-v2", cache_dir="/tmp/flashrank")  # noqa: S108
             passages = [
                 {"id": i, "text": c.content, "meta": {"chunk_id": c.chunk_id}}
                 for i, c in enumerate(chunks)

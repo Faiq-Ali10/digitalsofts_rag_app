@@ -6,8 +6,6 @@ Populates the database with initial products, admin user, and sample data.
 from __future__ import annotations
 
 import asyncio
-import uuid
-from datetime import datetime, timezone
 
 import structlog
 from sqlalchemy import select

@@ -2,14 +2,11 @@
 
 from __future__ import annotations
 
-import tempfile
-from pathlib import Path
-
 import pytest
 
+from app.ingestion.parsers.html_parser import HTMLParser
 from app.ingestion.parsers.markdown_parser import MarkdownParser
 from app.ingestion.parsers.text_parser import TextParser
-from app.ingestion.parsers.html_parser import HTMLParser
 
 
 class TestMarkdownParser:
@@ -17,7 +14,7 @@ class TestMarkdownParser:
 
     def test_parse_simple_markdown(self, tmp_path):
         """Should extract content and detect title from H1."""
-        md_content = "# My Document\n\nThis is the introduction.\n\n## Section 1\n\nContent of section 1.\n\n## Section 2\n\nContent of section 2."
+        md_content = "# My Document\n\nThis is the introduction.\n\n## Section 1\n\nContent of section 1.\n\n## Section 2\n\nContent of section 2."  # noqa: E501
         file_path = tmp_path / "test.md"
         file_path.write_text(md_content)
 
@@ -108,7 +105,7 @@ class TestHTMLParser:
 
     def test_parse_simple_html(self, tmp_path):
         """Should extract text and strip tags."""
-        html = "<html><head><title>Test Page</title></head><body><h1>Heading</h1><p>Content here.</p></body></html>"
+        html = "<html><head><title>Test Page</title></head><body><h1>Heading</h1><p>Content here.</p></body></html>"  # noqa: E501
         file_path = tmp_path / "test.html"
         file_path.write_text(html)
 
@@ -121,7 +118,7 @@ class TestHTMLParser:
 
     def test_removes_script_tags(self, tmp_path):
         """Should remove script and style content."""
-        html = "<html><body><script>alert('xss')</script><p>Real content</p><style>.x{color:red}</style></body></html>"
+        html = "<html><body><script>alert('xss')</script><p>Real content</p><style>.x{color:red}</style></body></html>"  # noqa: E501
         file_path = tmp_path / "test.html"
         file_path.write_text(html)
 

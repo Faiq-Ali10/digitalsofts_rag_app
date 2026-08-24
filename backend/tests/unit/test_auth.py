@@ -22,7 +22,7 @@ class TestPasswordHashing:
 
     def test_hash_and_verify(self):
         """Password hash should verify correctly."""
-        password = "MySecurePassword123!"
+        password = "MySecurePassword123!"  # noqa: S105
         hashed = hash_password(password)
 
         assert verify_password(password, hashed)
@@ -30,7 +30,7 @@ class TestPasswordHashing:
 
     def test_different_hashes(self):
         """Same password should produce different hashes (salt)."""
-        password = "TestPassword"
+        password = "TestPassword"  # noqa: S105
         hash1 = hash_password(password)
         hash2 = hash_password(password)
 
@@ -68,7 +68,7 @@ class TestTokenCreation:
         pair = create_token_pair(user_id, "user")
 
         assert pair.access_token != pair.refresh_token
-        assert pair.token_type == "bearer"
+        assert pair.token_type == "bearer"  # noqa: S105
         assert pair.expires_in > 0
 
     def test_expired_token_rejected(self):
@@ -80,8 +80,8 @@ class TestTokenCreation:
             "sub": str(user_id),
             "role": "user",
             "type": "access",
-            "exp": datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(hours=1),
-            "iat": datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(hours=2),
+            "exp": datetime.datetime.now(datetime.UTC) - datetime.timedelta(hours=1),
+            "iat": datetime.datetime.now(datetime.UTC) - datetime.timedelta(hours=2),
             "jti": str(uuid.uuid4()),
         }
         from app.config import get_settings

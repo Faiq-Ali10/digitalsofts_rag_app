@@ -9,7 +9,6 @@ from __future__ import annotations
 import uuid
 
 import structlog
-from arq import cron
 from arq.connections import RedisSettings
 
 from app.config import get_settings

@@ -32,7 +32,7 @@ from app.agents.state import AgentState
 from app.config import get_settings
 
 try:
-    from langfuse.decorators import observe, langfuse_context
+    from langfuse.decorators import langfuse_context, observe
 except ImportError:
     # Dummy fallback if langfuse is not installed
     def observe(*args, **kwargs):

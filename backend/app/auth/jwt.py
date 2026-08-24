@@ -7,7 +7,7 @@ access + refresh token pattern.
 from __future__ import annotations
 
 import uuid
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 import bcrypt
 import jwt
@@ -60,7 +60,7 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 
 def create_access_token(user_id: uuid.UUID, role: str) -> str:
     """Create a short-lived access token."""
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     payload = {
         "sub": str(user_id),
         "role": role,
@@ -74,7 +74,7 @@ def create_access_token(user_id: uuid.UUID, role: str) -> str:
 
 def create_refresh_token(user_id: uuid.UUID, role: str) -> str:
     """Create a long-lived refresh token."""
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     payload = {
         "sub": str(user_id),
         "role": role,
