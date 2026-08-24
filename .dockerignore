@@ -1,0 +1,12 @@
+node_modules
+venv
+.venv
+__pycache__
+.next
+.env
+.env.local
+.git
+.gitignore
+.vscode
+.idea
+.pytest_cache
