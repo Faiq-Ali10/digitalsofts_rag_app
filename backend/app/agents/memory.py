@@ -163,13 +163,13 @@ async def summarize_conversation_task(conversation_id: uuid.UUID) -> None:
     logger.info("starting_summarization", conversation_id=str(conversation_id))
 
     try:
-        async with async_session_factory() as db:
+        async with async_session_factory() as session:
             # Check if we actually need to summarize
-            if not await should_summarize(db, conversation_id):
+            if not await should_summarize(session, conversation_id):
                 return
 
             # Get full history to summarize (up to last 20 messages)
-            history = await get_message_history(db, conversation_id, max_messages=20)
+            history = await get_message_history(session, conversation_id, max_messages=20)
 
             if not history:
                 return
@@ -191,8 +191,8 @@ async def summarize_conversation_task(conversation_id: uuid.UUID) -> None:
             )
 
             summary = response.content.strip()
-            await update_conversation_summary(db, conversation_id, summary)
-            await db.commit()
+            await update_conversation_summary(session, conversation_id, summary)
+            await session.commit()
 
             logger.info("summarization_completed", conversation_id=str(conversation_id))
 
