@@ -129,6 +129,7 @@ jobs:
           host: ${{ secrets.SERVER_IP }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
+          command_timeout: 30m
           envs: DATABASE_URL,JWT_SECRET_KEY,APP_ENV,CORS_ORIGINS
           script: |
             cd ~/fastapi-app
