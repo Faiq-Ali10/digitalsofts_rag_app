@@ -192,8 +192,8 @@ async def run_agent(
                         .limit(1)
                     )
                     pending_tool = result.scalar_one_or_none()
-                except Exception:
-                    pass
+                except Exception as e:
+                    logger.warning("failed_to_query_pending_tool", error=str(e))
 
         if pending_tool:
             # Bypass intent classifier and route directly to execute
