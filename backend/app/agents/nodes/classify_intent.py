@@ -133,7 +133,11 @@ async def classify_intent(state: AgentState) -> AgentState:
         )
 
     except Exception as e:
-        logger.error("classification_failed", error=str(e), raw_content=content if 'content' in locals() else 'None')
+        logger.error(
+            "classification_failed",
+            error=str(e),
+            raw_content=content if "content" in locals() else "None",
+        )
         # Default to knowledge question on classification failure
         state.intent = "knowledge"
         state.intent_confidence = 0.3

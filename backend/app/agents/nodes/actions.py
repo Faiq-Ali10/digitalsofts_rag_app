@@ -154,7 +154,11 @@ async def validate_action(state: AgentState) -> AgentState:
         )
 
     except json.JSONDecodeError as e:
-        logger.error("action_json_decode_failed", error=str(e), raw_content=content if 'content' in locals() else 'None')
+        logger.error(
+            "action_json_decode_failed",
+            error=str(e),
+            raw_content=content if "content" in locals() else "None",
+        )
         state.response = (
             "I understood you'd like to take an action, but I couldn't determine "
             "the specific details. Could you please rephrase your request?"

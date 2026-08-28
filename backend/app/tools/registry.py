@@ -17,7 +17,7 @@ import time
 from collections.abc import Callable, Coroutine  # noqa: TC003
 from dataclasses import dataclass
 from datetime import date
-from typing import Any, Optional  # noqa: TC003
+from typing import Any  # noqa: TC003
 
 import structlog
 from pydantic import Field, create_model
@@ -51,26 +51,27 @@ _tools: dict[str, ToolDefinition] = {}
 def register_tool(tool_def: ToolDefinition) -> None:
     """Register a tool in the allowlist and generate its JSON schema."""
     import inspect
-    
+
     # Dynamically generate JSON Schema for the tool handler
     sig = inspect.signature(tool_def.handler)
     fields = {}
     for param_name, param in sig.parameters.items():
-        if param_name in ('self', 'cls'): continue
+        if param_name in ("self", "cls"):
+            continue
         annotation = param.annotation if param.annotation != inspect.Parameter.empty else Any
         default = param.default if param.default != inspect.Parameter.empty else ...
         fields[param_name] = (annotation, default)
-        
+
     model = create_model(f"{tool_def.name}Model", **fields)
     schema = model.model_json_schema()
-    
+
     tool_def.schema = {
         "type": "function",
         "function": {
             "name": tool_def.name,
             "description": tool_def.description,
-            "parameters": schema
-        }
+            "parameters": schema,
+        },
     }
 
     _tools[tool_def.name] = tool_def

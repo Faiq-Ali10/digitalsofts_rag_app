@@ -162,13 +162,22 @@ async def run_agent(
 
     try:
         # Step 0: Check for pending tool calls
-        from app.db.session import async_session_factory
-        from sqlalchemy import select
-        from app.db.models import ToolCall, ToolCallStatus, Message
         import uuid
 
-        is_confirmation = query.strip().lower() in ("confirm", "yes", "proceed", "y", "execute", "do it")
-        
+        from sqlalchemy import select
+
+        from app.db.models import Message, ToolCall, ToolCallStatus
+        from app.db.session import async_session_factory
+
+        is_confirmation = query.strip().lower() in (
+            "confirm",
+            "yes",
+            "proceed",
+            "y",
+            "execute",
+            "do it",
+        )
+
         pending_tool = None
         if conversation_id and is_confirmation:
             async with async_session_factory() as session:
@@ -190,6 +199,7 @@ async def run_agent(
             # Bypass intent classifier and route directly to execute
             state.intent = "action"
             from app.agents.state import ToolCallRecord
+
             tc_record = ToolCallRecord(
                 tool_name=pending_tool.tool_name,
                 tool_input=pending_tool.tool_input,
@@ -236,17 +246,24 @@ async def run_agent(
             state = await execute_action(state)
             if pending_tool:
                 async with async_session_factory() as session:
-                    result = await session.execute(select(ToolCall).where(ToolCall.id == pending_tool.id))
+                    result = await session.execute(
+                        select(ToolCall).where(ToolCall.id == pending_tool.id)
+                    )
                     db_tool = result.scalar_one_or_none()
                     if db_tool:
-                        executed_record = next((tc for tc in state.tool_calls if tc.tool_name == db_tool.tool_name), None)
+                        executed_record = next(
+                            (tc for tc in state.tool_calls if tc.tool_name == db_tool.tool_name),
+                            None,
+                        )
                         if executed_record and executed_record.status == "executed":
                             db_tool.status = ToolCallStatus.EXECUTED
                             db_tool.tool_output = executed_record.tool_output
                         else:
                             db_tool.status = ToolCallStatus.FAILED
                             if executed_record:
-                                db_tool.error = getattr(executed_record, "error", str(executed_record.error))
+                                db_tool.error = getattr(
+                                    executed_record, "error", str(executed_record.error)
+                                )
                         await session.commit()
 
         elif route == "generate_unsupported":
