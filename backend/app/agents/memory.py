@@ -162,39 +162,42 @@ async def summarize_conversation_task(conversation_id: uuid.UUID) -> None:
 
     logger.info("starting_summarization", conversation_id=str(conversation_id))
 
+    db = async_session_factory()
     try:
-        async with async_session_factory() as session:
-            # Check if we actually need to summarize
-            if not await should_summarize(session, conversation_id):
-                return
+        # Check if we actually need to summarize
+        if not await should_summarize(db, conversation_id):
+            return
 
-            # Get full history to summarize (up to last 20 messages)
-            history = await get_message_history(session, conversation_id, max_messages=20)
+        # Get full history to summarize (up to last 20 messages)
+        history = await get_message_history(db, conversation_id, max_messages=20)
 
-            if not history:
-                return
+        if not history:
+            return
 
-            # Prepare LLM request
-            llm = get_llm_provider()
-            history_text = "\n".join([f"{msg['role']}: {msg['content']}" for msg in history])
+        # Prepare LLM request
+        llm = get_llm_provider()
+        history_text = "\n".join([f"{msg['role']}: {msg['content']}" for msg in history])
 
-            response = await llm.complete(
-                messages=[
-                    {
-                        "role": "system",
-                        "content": "Summarize the following conversation concisely. Focus on the user's main goals, key facts established, and any pending actions. Do not exceed 200 words.",
-                    },
-                    {"role": "user", "content": history_text},
-                ],
-                temperature=0.1,
-                max_tokens=300,
-            )
+        response = await llm.complete(
+            messages=[
+                {
+                    "role": "system",
+                    "content": "Summarize the following conversation concisely. Focus on the user's main goals, key facts established, and any pending actions. Do not exceed 200 words.",
+                },
+                {"role": "user", "content": history_text},
+            ],
+            temperature=0.1,
+            max_tokens=300,
+        )
 
-            summary = response.content.strip()
-            await update_conversation_summary(session, conversation_id, summary)
-            await session.commit()
+        summary = response.content.strip()
+        await update_conversation_summary(db, conversation_id, summary)
+        await db.commit()
 
-            logger.info("summarization_completed", conversation_id=str(conversation_id))
+        logger.info("summarization_completed", conversation_id=str(conversation_id))
 
     except Exception as e:
         logger.error("summarization_failed", conversation_id=str(conversation_id), error=str(e))
+        await db.rollback()
+    finally:
+        await db.close()

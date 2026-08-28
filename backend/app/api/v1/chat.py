@@ -8,10 +8,11 @@ POST /api/v1/feedback — Submit feedback on a response
 
 from __future__ import annotations
 
+import asyncio
 import uuid
 
 import structlog
-from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -117,7 +118,6 @@ class ToolConfirmRequest(BaseModel):
 @router.post("/chat", response_model=APIResponse[ChatResponse])
 async def chat(
     body: ChatRequest,
-    background_tasks: BackgroundTasks,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ) -> APIResponse[ChatResponse]:
@@ -192,7 +192,7 @@ async def chat(
     await db.flush()
 
     # 5.5 Schedule summarization task
-    background_tasks.add_task(summarize_conversation_task, conv.id)
+    asyncio.create_task(summarize_conversation_task(conv.id))
 
     # 6. Build response
     return APIResponse(

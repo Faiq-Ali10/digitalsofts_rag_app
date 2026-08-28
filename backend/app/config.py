@@ -49,7 +49,7 @@ class Settings(BaseSettings):
     gemini_api_key: str = ""
     groq_api_key: str = ""
     llm_primary_model: str = "gemini/gemini-3.6-flash"
-    llm_fallback_model: str = "groq/llama-3.1-70b-versatile"
+    llm_fallback_model: str = "groq/openai/gpt-oss-120b"
     llm_eval_model: str = "gemini/gemini-3.6-flash"
     llm_temperature: float = 0.1
     llm_max_tokens: int = 2048

@@ -35,6 +35,13 @@ async def lifespan(app: FastAPI):
         json_format=settings.is_production,
     )
 
+    # Pre-load embedding model to avoid cold-start delays on first request
+    logger.info("warming_up_embedding_model")
+    from app.llm.embeddings import get_embedding_provider
+
+    provider = get_embedding_provider()
+    provider._get_model()  # Force model to load into RAM immediately
+
     # Register agent tools
     from app.tools.registry import register_all_tools
 

@@ -99,3 +99,42 @@ jobs:
         run: docker build -t digitalsofts-backend ./backend
       - name: Verify image
         run: docker run --rm digitalsofts-backend python -c "import app; print('OK')"
+
+  deploy:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Copy files via SCP
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: "."
+          target: "~/fastapi-app"
+
+      - name: Restart Containers via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
+          APP_ENV: ${{ secrets.APP_ENV }}
+          CORS_ORIGINS: ${{ secrets.CORS_ORIGINS }}
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          envs: DATABASE_URL,JWT_SECRET_KEY,APP_ENV,CORS_ORIGINS
+          script: |
+            cd ~/fastapi-app
+            echo "DATABASE_URL='${DATABASE_URL}'" > .env
+            echo "JWT_SECRET_KEY='${JWT_SECRET_KEY}'" >> .env
+            echo "APP_ENV='${APP_ENV}'" >> .env
+            echo "CORS_ORIGINS='${CORS_ORIGINS}'" >> .env
+            docker compose down
+            docker compose up -d --build

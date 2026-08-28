@@ -40,8 +40,8 @@ CLASSIFICATION_PROMPT = """You are an intent classifier for an enterprise AI ass
 
 Classify the user's query into exactly ONE of these categories:
 
-1. "knowledge" — The user is asking a question that can be answered from product documentation, FAQs, policies, or company knowledge base.
-2. "structured" — The user wants to search for or compare specific products/services. Requires querying structured product data.
+1. "knowledge" — The user is asking a general question that can be answered from product documentation, FAQs, policies, or company knowledge base (e.g., "How does X work?", "What is the return policy?"). Do NOT use this if the user is asking to search for products.
+2. "structured" — The user wants to search for, list, or compare specific products/services by name, feature, or category (e.g., "Search your products for X", "What products do you have for Y").
 3. "action" — The user wants to perform an action: request a demo, create a ticket, contact sales, schedule a meeting.
 4. "unsupported" — The query is outside the scope of the enterprise assistant (personal questions, general trivia, coding help, etc.).
 
@@ -103,14 +103,16 @@ async def classify_intent(state: AgentState) -> AgentState:
             ],
             temperature=0.0,
             max_tokens=200,
+            response_format={"type": "json_object"},
         )
 
         # Parse JSON response
         content = response.content.strip()
         # Handle markdown code blocks
         if content.startswith("```"):
-            content = re.sub(r"```(?:json)?\s*", "", content)
-            content = content.rstrip("`").strip()
+            # Strip the first line (e.g., ```json) and the last line (```)
+            content = "\n".join(content.split("\n")[1:-1])
+            content = content.strip()
 
         result = json.loads(content)
 
@@ -131,7 +133,7 @@ async def classify_intent(state: AgentState) -> AgentState:
         )
 
     except Exception as e:
-        logger.error("classification_failed", error=str(e))
+        logger.error("classification_failed", error=str(e), raw_content=content if 'content' in locals() else 'None')
         # Default to knowledge question on classification failure
         state.intent = "knowledge"
         state.intent_confidence = 0.3

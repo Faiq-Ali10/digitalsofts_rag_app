@@ -161,11 +161,47 @@ async def run_agent(
     )
 
     try:
-        # Step 1: Classify intent
-        state = await classify_intent(state)
+        # Step 0: Check for pending tool calls
+        from app.db.session import async_session_factory
+        from sqlalchemy import select
+        from app.db.models import ToolCall, ToolCallStatus, Message
+        import uuid
 
-        # Route based on intent
-        route = _route_after_classify(state)
+        is_confirmation = query.strip().lower() in ("confirm", "yes", "proceed", "y", "execute", "do it")
+        
+        pending_tool = None
+        if conversation_id and is_confirmation:
+            async with async_session_factory() as session:
+                try:
+                    conv_uuid = uuid.UUID(conversation_id)
+                    result = await session.execute(
+                        select(ToolCall)
+                        .join(Message, Message.id == ToolCall.message_id)
+                        .where(Message.conversation_id == conv_uuid)
+                        .where(ToolCall.status == ToolCallStatus.PENDING)
+                        .order_by(ToolCall.created_at.desc())
+                        .limit(1)
+                    )
+                    pending_tool = result.scalar_one_or_none()
+                except Exception:
+                    pass
+
+        if pending_tool:
+            # Bypass intent classifier and route directly to execute
+            state.intent = "action"
+            from app.agents.state import ToolCallRecord
+            tc_record = ToolCallRecord(
+                tool_name=pending_tool.tool_name,
+                tool_input=pending_tool.tool_input,
+                status="approved",
+            )
+            state.tool_calls.append(tc_record)
+            route = "execute_action"
+        else:
+            # Step 1: Classify intent
+            state = await classify_intent(state)
+            # Route based on intent
+            route = _route_after_classify(state)
 
         if route == "end":
             # Blocked or already has response
@@ -195,6 +231,23 @@ async def run_agent(
 
             if action_route == "execute_action":
                 state = await execute_action(state)
+
+        elif route == "execute_action":
+            state = await execute_action(state)
+            if pending_tool:
+                async with async_session_factory() as session:
+                    result = await session.execute(select(ToolCall).where(ToolCall.id == pending_tool.id))
+                    db_tool = result.scalar_one_or_none()
+                    if db_tool:
+                        executed_record = next((tc for tc in state.tool_calls if tc.tool_name == db_tool.tool_name), None)
+                        if executed_record and executed_record.status == "executed":
+                            db_tool.status = ToolCallStatus.EXECUTED
+                            db_tool.tool_output = executed_record.tool_output
+                        else:
+                            db_tool.status = ToolCallStatus.FAILED
+                            if executed_record:
+                                db_tool.error = getattr(executed_record, "error", str(executed_record.error))
+                        await session.commit()
 
         elif route == "generate_unsupported":
             state = await generate_unsupported(state)

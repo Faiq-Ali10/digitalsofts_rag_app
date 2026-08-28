@@ -81,12 +81,14 @@ async def validate_action(state: AgentState) -> AgentState:
             ],
             temperature=0.0,
             max_tokens=300,
+            response_format={"type": "json_object"},
         )
 
         content = response.content.strip()
         if content.startswith("```"):
-            content = re.sub(r"```(?:json)?\s*", "", content)
-            content = content.rstrip("`").strip()
+            # Strip the first line (e.g., ```json) and the last line (```)
+            content = "\n".join(content.split("\n")[1:-1])
+            content = content.strip()
 
         result = json.loads(content)
 
@@ -143,6 +145,7 @@ async def validate_action(state: AgentState) -> AgentState:
         else:
             # Auto-execute read-only tools
             tool_call.status = "approved"
+            state.confidence = "supported"
 
         logger.info(
             "action_validated",
@@ -150,7 +153,8 @@ async def validate_action(state: AgentState) -> AgentState:
             requires_confirmation=requires_conf,
         )
 
-    except json.JSONDecodeError:
+    except json.JSONDecodeError as e:
+        logger.error("action_json_decode_failed", error=str(e), raw_content=content if 'content' in locals() else 'None')
         state.response = (
             "I understood you'd like to take an action, but I couldn't determine "
             "the specific details. Could you please rephrase your request?"
