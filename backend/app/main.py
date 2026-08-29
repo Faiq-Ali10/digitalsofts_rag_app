@@ -74,7 +74,7 @@ app.add_middleware(
         "http://localhost:3000",
         "http://127.0.0.1:3000",
         "http://204.216.106.54:3000",
-        "http://204.216.106.54"
+        "http://204.216.106.54",
     ],
     allow_credentials=True,
     allow_methods=["*"],
